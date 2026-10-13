@@ -79,6 +79,10 @@
   .brand .kicker { font-size: 13px; letter-spacing: 4px; color: var(--muted); }
   .brand .name { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
   .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .site-nav { display: flex; gap: 8px; }
+  .site-nav a { font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 18px; background: var(--panel); color: var(--text); clip-path: var(--cut-sm); }
+  .site-nav a:hover { background: var(--panel-hover); color: #fff; }
+  .site-nav a[aria-current="page"] { background: var(--gold); color: var(--bg); }
   .server-ip { font-size: 16px; color: var(--muted); background: none; padding: 0; }
   .server-ip:hover { color: var(--text); }
   .cart-btn { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
@@ -92,6 +96,22 @@
   .hero h1 { margin: 0; font-weight: 800; font-size: clamp(56px,11vw,128px); line-height: 1; letter-spacing: .04em; color: var(--gold); text-shadow: 0 0 24px rgba(242,210,75,.35); text-transform: uppercase; }
   .hero p { margin: 0; max-width: 620px; font-size: 20px; color: var(--muted); line-height: 1.4; text-wrap: pretty; }
   .notice { font-size: 14px; letter-spacing: 1px; color: var(--blue); border: 1px dashed rgba(63,180,234,.5); padding: 8px 14px; }
+
+  /* Search */
+  .search { position: relative; width: min(560px, calc(100% - 32px)); margin: 16px auto 0; }
+  .search svg { position: absolute; left: 16px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search input { width: 100%; font-family: 'Share Tech Mono', monospace; font-size: 16px; letter-spacing: 1px; padding: 16px 48px 16px 46px;
+    background: rgba(13,16,32,.85); border: 1px solid var(--line); color: var(--text); outline: none; clip-path: var(--cut-sm); }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus { border-color: var(--gold); }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search .clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; color: var(--muted); font-size: 24px; line-height: 1; padding: 4px 8px; }
+  .search .clear:hover { color: var(--text); }
+  .search .clear[hidden] { display: none; }
+  .results-meta { text-align: center; font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; min-height: 1.2em; margin-bottom: 16px; }
+  .no-results { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px 16px; text-align: center; }
+  .no-results .big { font-weight: 800; font-size: clamp(28px,5vw,40px); color: var(--gold); text-shadow: 0 0 24px rgba(242,210,75,.35); text-transform: uppercase; }
+  .no-results p { margin: 0; color: var(--muted); font-size: 18px; max-width: 460px; }
 
   /* Tabs */
   .tabs { position: relative; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 16px clamp(16px,4vw,48px) 8px; }
@@ -179,6 +199,10 @@
     </a>
     <div class="header-right">
       <button class="server-ip mono" id="copyIp" title="Copy server address">play.thegalaxybeyond.net</button>
+      <nav class="site-nav" aria-label="Site">
+        <a href="store.html" aria-current="page">Store</a>
+        <a href="wiki.html">Wiki</a>
+      </nav>
       <button class="cart-btn" id="openCart" aria-label="Open cart">Cart <span class="cart-count" id="cartCount">0</span></button>
     </div>
   </header>
@@ -190,9 +214,16 @@
     <div class="notice mono">PREVIEW · Items and prices are placeholders. Checkout is offline.</div>
   </section>
 
+  <div class="search" role="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input type="search" id="search" placeholder="Search the archives…  ( / )" aria-label="Search store items" autocomplete="off" spellcheck="false">
+    <button class="clear" id="clearSearch" aria-label="Clear search" hidden>&times;</button>
+  </div>
+
   <nav class="tabs" id="tabs" aria-label="Store categories"></nav>
 
   <main>
+    <div class="results-meta mono" id="resultsMeta" aria-live="polite"></div>
     <div class="grid" id="grid"></div>
   </main>
 
@@ -305,6 +336,13 @@
   const save = () => { try { localStorage.setItem('tgb-cart', JSON.stringify(cart)); } catch (e) {} };
 
   let active = 'All';
+  let query = '';
+  const searchEl = document.getElementById('search');
+  const clearEl = document.getElementById('clearSearch');
+  const metaEl = document.getElementById('resultsMeta');
+  // Every word in the query must appear somewhere in the item's name, category, tag or perks.
+  const haystack = i => [i.name, i.cat, i.tag || '', ...i.perks].join(' ').toLowerCase();
+  const matches = i => query.split(/\s+/).filter(Boolean).every(w => haystack(i).includes(w));
   const tabs = document.getElementById('tabs');
   const grid = document.getElementById('grid');
 
@@ -312,7 +350,16 @@
     tabs.innerHTML = CATS.map(c => `<button class="tab" data-cat="${c}" aria-pressed="${c === active}">${c}</button>`).join('');
   }
   function renderGrid() {
-    const list = active === 'All' ? ITEMS : ITEMS.filter(i => i.cat === active);
+    const list = ITEMS.filter(i => (active === 'All' || i.cat === active) && matches(i));
+    metaEl.textContent = query ? `${list.length} result${list.length === 1 ? '' : 's'} for "${searchEl.value.trim()}"${active === 'All' ? '' : ' in ' + active}` : '';
+    if (!list.length) {
+      grid.innerHTML = `<div class="no-results">
+        <div class="big">No signal</div>
+        <p>Nothing in the archives matches that search. Try another word${active === 'All' ? '' : ' or search all categories'}.</p>
+        <button class="tab" id="resetSearch">Clear search</button>
+      </div>`;
+      return;
+    }
     grid.innerHTML = list.map(i => `
       <article class="card${i.featured ? ' featured' : ''}">
         ${i.tag ? `<span class="tag mono ${i.tagClass || ''}">${esc(i.tag)}</span>` : ''}
@@ -357,7 +404,25 @@
     const b = e.target.closest('.tab'); if (!b) return;
     active = b.dataset.cat; renderTabs(); renderGrid();
   });
+  searchEl.addEventListener('input', () => {
+    query = searchEl.value.trim().toLowerCase();
+    clearEl.hidden = !searchEl.value;
+    renderGrid();
+  });
+  const resetSearch = () => {
+    searchEl.value = ''; query = ''; clearEl.hidden = true;
+    active = 'All'; renderTabs(); renderGrid(); searchEl.focus();
+  };
+  clearEl.onclick = resetSearch;
+  searchEl.addEventListener('keydown', e => { if (e.key === 'Escape' && searchEl.value) { e.stopPropagation(); resetSearch(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName) && !document.body.classList.contains('cart-open')) {
+      e.preventDefault(); searchEl.focus();
+    }
+  });
+
   grid.addEventListener('click', e => {
+    if (e.target.closest('#resetSearch')) { resetSearch(); return; }
     const b = e.target.closest('.add'); if (!b) return;
     cart[b.dataset.id] = (cart[b.dataset.id] || 0) + 1; save(); renderCart();
     b.textContent = 'Added'; b.classList.add('added');
