@@ -79,6 +79,10 @@
   .brand .kicker { font-size: 13px; letter-spacing: 4px; color: var(--muted); }
   .brand .name { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
   .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .site-nav { display: flex; gap: 8px; }
+  .site-nav a { font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 18px; background: var(--panel); color: var(--text); clip-path: var(--cut-sm); }
+  .site-nav a:hover { background: var(--panel-hover); color: #fff; }
+  .site-nav a[aria-current="page"] { background: var(--gold); color: var(--bg); }
   .server-ip { font-size: 16px; color: var(--muted); background: none; padding: 0; }
   .server-ip:hover { color: var(--text); }
   .cart-btn { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
@@ -195,6 +199,10 @@
     </a>
     <div class="header-right">
       <button class="server-ip mono" id="copyIp" title="Copy server address">play.thegalaxybeyond.net</button>
+      <nav class="site-nav" aria-label="Site">
+        <a href="store.html" aria-current="page">Store</a>
+        <a href="wiki.html">Wiki</a>
+      </nav>
       <button class="cart-btn" id="openCart" aria-label="Open cart">Cart <span class="cart-count" id="cartCount">0</span></button>
     </div>
   </header>

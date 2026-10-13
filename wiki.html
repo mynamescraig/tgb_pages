@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiki · The Galaxy Beyond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080c;
+    --panel: #1b2034;
+    --panel-hover: #262d48;
+    --line: #2a3150;
+    --text: #e8e6df;
+    --muted: #8a8fa3;
+    --faint: #6b7088;
+    --gold: #f2d24b;
+    --gold-hi: #fff3b0;
+    --blue: #3fb4ea;
+    --red: #e5484d;
+    --cut: polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+    --cut-sm: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body { color: var(--text); font-family: 'Oxanium', sans-serif; }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { color: var(--gold-hi); }
+  button { font-family: inherit; cursor: pointer; border: 0; }
+  .mono { font-family: 'Share Tech Mono', monospace; }
+
+  @keyframes twinkle { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+  @keyframes drift { from { background-position: 0 0 } to { background-position: -340px 0 } }
+  @keyframes driftX { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+  @keyframes glow { 0%,100% { opacity: .7 } 50% { opacity: 1 } }
+  @keyframes holoFlicker { 0%,100% { opacity: 1 } 46% { opacity: 1 } 48% { opacity: .93 } 50% { opacity: 1 } 81% { opacity: 1 } 83% { opacity: .96 } 85% { opacity: 1 } }
+  @keyframes holoRoll { from { transform: translateY(-30vh) } to { transform: translateY(130vh) } }
+  @keyframes holoLines { from { background-position: 0 0 } to { background-position: 0 6px } }
+
+  .page { position: relative; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* Background layers (same as 404) */
+  .bg-glow, .bg-stars, .bg-twinkle { position: absolute; inset: 0; pointer-events: none; }
+  .bg-glow { background: radial-gradient(ellipse at 50% 120%, #1a2240 0%, #07080c 60%); animation: glow 9s ease-in-out infinite; }
+  .bg-stars {
+    background-image:
+      radial-gradient(1px 1px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 120px 80px,#cfd8ff,transparent),
+      radial-gradient(2px 2px at 200px 160px,#fff,transparent),
+      radial-gradient(1px 1px at 310px 50px,#fff,transparent),
+      radial-gradient(1px 1px at 60px 210px,#ffe9c4,transparent),
+      radial-gradient(2px 2px at 260px 260px,#fff,transparent);
+    background-size: 340px 300px; opacity: .8; animation: drift 60s linear infinite;
+  }
+  .bg-twinkle { overflow: hidden; }
+  .bg-twinkle .track { position: absolute; top: 0; bottom: 0; left: 0; width: 200%; animation: driftX 240s linear infinite; }
+  .bg-twinkle .star { position: absolute; background: #fff; }
+
+  .holo { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; animation: holoFlicker 7s ease-in-out infinite; }
+  .holo > div { position: absolute; }
+  .holo .tint { inset: 0; background: #4fb8ff; mix-blend-mode: color; opacity: .066; }
+  .holo .lines { inset: 0; opacity: .12; animation: holoLines .6s linear infinite;
+    background-image: repeating-linear-gradient(0deg, rgba(120,200,255,.10) 0px, rgba(120,200,255,.10) 1px, transparent 1px, transparent 3px, rgba(0,0,0,.35) 3px, rgba(0,0,0,.35) 4px, transparent 4px, transparent 6px); }
+  .holo .roll { left: 0; right: 0; top: 0; height: 18vh; opacity: .12; animation: holoRoll 6s linear infinite;
+    background: linear-gradient(180deg, transparent, rgba(140,210,255,.10) 50%, transparent); }
+  .holo .vignette { inset: 0; box-shadow: inset 0 0 160px rgba(60,160,255,.25); opacity: .12; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+  }
+
+  /* Header */
+  header { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 24px clamp(16px,4vw,48px); flex-wrap: wrap; }
+  .brand { display: flex; flex-direction: column; gap: 4px; color: var(--text); }
+  .brand:hover { color: var(--text); }
+  .brand .kicker { font-size: 13px; letter-spacing: 4px; color: var(--muted); }
+  .brand .name { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .site-nav { display: flex; gap: 8px; }
+  .site-nav a { font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 18px; background: var(--panel); color: var(--text); clip-path: var(--cut-sm); }
+  .site-nav a:hover { background: var(--panel-hover); color: #fff; }
+  .site-nav a[aria-current="page"] { background: var(--gold); color: var(--bg); }
+  .server-ip { font-size: 16px; color: var(--muted); background: none; padding: 0; }
+  .server-ip:hover { color: var(--text); }
+
+  /* Hero */
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 24px clamp(16px,4vw,48px) 8px; }
+  .hero .kicker { font-size: 18px; letter-spacing: 5px; color: var(--muted); text-transform: uppercase; }
+  .hero h1 { margin: 0; font-weight: 800; font-size: clamp(56px,11vw,112px); line-height: 1; letter-spacing: .04em; color: var(--gold); text-shadow: 0 0 24px rgba(242,210,75,.35); text-transform: uppercase; }
+  .notice { font-size: 14px; letter-spacing: 1px; color: var(--blue); border: 1px dashed rgba(63,180,234,.5); padding: 8px 14px; }
+
+  /* Search */
+  .search { position: relative; width: min(560px, calc(100% - 32px)); margin: 16px auto 0; }
+  .search svg { position: absolute; left: 16px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search input { width: 100%; font-family: 'Share Tech Mono', monospace; font-size: 16px; letter-spacing: 1px; padding: 16px 48px 16px 46px;
+    background: rgba(13,16,32,.85); border: 1px solid var(--line); color: var(--text); outline: none; clip-path: var(--cut-sm); }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus { border-color: var(--gold); }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search .clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; color: var(--muted); font-size: 24px; line-height: 1; padding: 4px 8px; }
+  .search .clear:hover { color: var(--text); }
+  .search .clear[hidden] { display: none; }
+
+  /* Layout */
+  .layout { position: relative; flex: 1; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px,4vw,48px) 64px;
+    display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 28px; align-items: start; }
+
+  /* Sidebar */
+  .sidebar { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 20px; background: rgba(27,32,52,.6); border: 1px solid var(--line); clip-path: var(--cut); }
+  .toc-toggle { display: none; }
+  .toc-group + .toc-group { margin-top: 20px; }
+  .toc-group h4 { margin: 0 0 8px; font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 12px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .toc-group ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .toc-group a { display: block; padding: 8px 10px; color: #c4c6d0; font-size: 15px; border-left: 2px solid transparent; }
+  .toc-group a:hover { color: var(--text); background: rgba(38,45,72,.6); }
+  .toc-group a[aria-current="page"] { color: var(--gold); border-left-color: var(--gold); background: rgba(242,210,75,.06); }
+
+  /* Article */
+  .article { min-width: 0; padding: clamp(20px,3vw,36px); background: rgba(27,32,52,.72); border: 1px solid var(--line); clip-path: var(--cut); }
+  .crumbs { font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  .crumbs a { color: var(--muted); }
+  .crumbs a:hover { color: var(--text); }
+  .article h1 { margin: 0 0 8px; font-weight: 800; font-size: clamp(30px,4vw,42px); letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
+  .article .lede { margin: 0 0 24px; font-size: 19px; color: var(--muted); line-height: 1.45; }
+  .article .body { font-size: 17px; line-height: 1.65; color: #d6d6d0; }
+  .article .body > :first-child { margin-top: 0; }
+  .article h2 { margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-weight: 800; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); }
+  .article h3 { margin: 24px 0 8px; font-weight: 600; font-size: 18px; letter-spacing: 1px; color: var(--gold); }
+  .article p { margin: 0 0 14px; }
+  .article ul, .article ol { margin: 0 0 14px; padding-left: 22px; }
+  .article li { margin: 4px 0; }
+  .article ul li::marker { color: var(--blue); }
+  .article code { font-family: 'Share Tech Mono', monospace; font-size: .92em; padding: 2px 6px; background: #0d1020; border: 1px solid var(--line); color: var(--gold-hi); }
+  .article .table-wrap { overflow-x: auto; margin: 0 0 16px; }
+  .article table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .article th { text-align: left; font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .article td { padding: 10px 12px; border-bottom: 1px solid rgba(42,49,80,.6); vertical-align: top; }
+  .article .callout { margin: 0 0 16px; padding: 14px 16px; border-left: 3px solid var(--blue); background: rgba(63,180,234,.07); }
+  .article .callout.warn { border-left-color: var(--red); background: rgba(229,72,77,.08); }
+  .article .callout strong { color: var(--text); }
+  .meta { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; letter-spacing: 1px; color: var(--faint); }
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .pager a { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: #0d1020; border: 1px solid var(--line); color: var(--text); clip-path: var(--cut-sm); }
+  .pager a:hover { border-color: var(--gold); color: var(--text); }
+  .pager a.next { text-align: right; grid-column: 2; }
+  .pager small { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+  /* Search results */
+  .results-meta { font-size: 13px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+  .result { display: block; padding: 16px 0; border-bottom: 1px solid var(--line); color: var(--text); }
+  .result:hover { color: var(--text); }
+  .result:hover .r-title { color: var(--gold-hi); }
+  .result .r-cat { font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .result .r-title { font-weight: 800; font-size: 20px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin: 2px 0 6px; }
+  .result .r-snip { color: #c4c6d0; font-size: 15px; line-height: 1.5; }
+  mark { background: rgba(242,210,75,.25); color: var(--gold-hi); padding: 0 2px; }
+  .empty { padding: 32px 0; text-align: center; }
+  .empty .big { font-weight: 800; font-size: clamp(28px,5vw,40px); color: var(--gold); text-shadow: 0 0 24px rgba(242,210,75,.35); text-transform: uppercase; }
+  .empty p { color: var(--muted); font-size: 18px; }
+
+  /* Footer (same as 404) */
+  footer { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 32px clamp(16px,4vw,48px) 24px; background: rgba(27,32,52,.6); border-top: 1px solid var(--line); text-align: center; }
+  .foot-groups { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .foot-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .foot-label { font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+  .socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .socials a { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--panel); clip-path: var(--cut-sm); }
+  .socials a:hover { background: var(--gold); }
+  .socials span { width: 22px; height: 22px; display: block; background: var(--text); -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+  .support { font-size: 18px; font-weight: 600; }
+  .disclaimer { font-size: 14px; color: var(--faint); }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; max-height: none; padding: 0; }
+    .toc-toggle { display: flex; width: 100%; justify-content: space-between; align-items: center; padding: 16px 20px; background: none; color: var(--text);
+      font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+    .toc-toggle .chev { transition: transform .2s; color: var(--muted); }
+    .sidebar.open .toc-toggle .chev { transform: rotate(180deg); }
+    .toc { display: none; padding: 0 20px 20px; }
+    .sidebar.open .toc { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bg-glow"></div>
+  <div class="bg-stars"></div>
+  <div class="bg-twinkle"><div class="track" id="twinkle"></div></div>
+
+  <header>
+    <a class="brand" href="https://thegalaxybeyond.net/">
+      <span class="kicker mono">HOLONET RELAY</span>
+      <span class="name">The Galaxy Beyond</span>
+    </a>
+    <div class="header-right">
+      <button class="server-ip mono" id="copyIp" title="Copy server address">play.thegalaxybeyond.net</button>
+      <nav class="site-nav" aria-label="Site">
+        <a href="store.html">Store</a>
+        <a href="wiki.html" aria-current="page">Wiki</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="kicker mono">Jedi Archives · Holocron Index</div>
+    <h1>Wiki</h1>
+    <div class="notice mono">PREVIEW · Articles are placeholders and will be rewritten.</div>
+    <div class="search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input type="search" id="search" placeholder="Search the archives…  ( / )" aria-label="Search the wiki" autocomplete="off" spellcheck="false">
+      <button class="clear" id="clearSearch" aria-label="Clear search" hidden>&times;</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc">Contents <span class="chev">▾</span></button>
+      <nav class="toc" id="toc" aria-label="Wiki articles"></nav>
+    </aside>
+    <article class="article" id="article" aria-live="polite"></article>
+  </div>
+
+  <footer>
+    <div class="foot-groups">
+      <div class="foot-group">
+        <div class="foot-label mono">Follow the transmission</div>
+        <nav class="socials" id="socials"></nav>
+      </div>
+      <div class="foot-group" style="gap:8px;">
+        <div class="foot-label mono">Support</div>
+        <a class="support" href="mailto:support@thegalaxybeyond.net">support@thegalaxybeyond.net</a>
+      </div>
+    </div>
+    <div class="disclaimer">A fan-made server. Not affiliated with Lucasfilm, Disney or Mojang.</div>
+  </footer>
+</div>
+
+<div class="holo" aria-hidden="true">
+  <div class="tint"></div><div class="lines"></div><div class="roll"></div><div class="vignette"></div>
+</div>
+
+<script>
+(function () {
+  // Placeholder articles. Each one is reached at wiki.html#/<id>.
+  // Link between articles with <a href="#/other-id">. Bodies are trusted HTML written here.
+  const ARTICLES = [
+    {
+      id: 'welcome', cat: 'Getting started', title: 'Welcome to the Galaxy',
+      lede: 'Everything you need to know before your first jump to hyperspace.',
+      body: `
+        <p>The Galaxy Beyond is a Star Wars–themed Minecraft server with custom planets, factions, lightsaber combat and starships. This wiki is the archive for how it all works.</p>
+        <h2>Where to begin</h2>
+        <ul>
+          <li><a href="#/joining">Joining the server</a>: connect for the first time.</li>
+          <li><a href="#/rules">Server rules</a>: read these before you play.</li>
+          <li><a href="#/factions">Factions</a>: choose your path through the galaxy.</li>
+          <li><a href="#/commands">Commands</a>: the essentials you'll use every day.</li>
+        </ul>
+        <div class="callout"><strong>New here?</strong> Type <code>/tutorial</code> in game for a guided tour of the starting station.</div>`
+    },
+    {
+      id: 'joining', cat: 'Getting started', title: 'Joining the server',
+      lede: 'Connect to the holonet relay from Minecraft Java Edition.',
+      body: `
+        <h2>Requirements</h2>
+        <ul>
+          <li>Minecraft Java Edition 1.21 or newer</li>
+          <li>The server resource pack (you'll be prompted to download it automatically)</li>
+        </ul>
+        <h2>Connecting</h2>
+        <ol>
+          <li>Open Minecraft and choose <strong>Multiplayer</strong>.</li>
+          <li>Click <strong>Add Server</strong> and enter <code>play.thegalaxybeyond.net</code>.</li>
+          <li>Set <strong>Server Resource Packs</strong> to <em>Enabled</em>.</li>
+          <li>Join, and you'll arrive at the Outer Rim Station.</li>
+        </ol>
+        <div class="callout warn"><strong>Pack won't load?</strong> Remove the server from your list, add it again and make sure resource packs are enabled.</div>`
+    },
+    {
+      id: 'rules', cat: 'Getting started', title: 'Server rules',
+      lede: 'Keep the galaxy fun for everyone. Breaking these can lead to mutes, kicks or bans.',
+      body: `
+        <ol>
+          <li><strong>Be respectful.</strong> No harassment, hate speech or targeted insults.</li>
+          <li><strong>No cheating.</strong> Hacked clients, x-ray and auto-clickers are banned.</li>
+          <li><strong>No griefing</strong> outside of designated PvP zones.</li>
+          <li><strong>No spam or advertising</strong> in chat.</li>
+          <li><strong>Keep usernames and builds appropriate.</strong></li>
+          <li><strong>Staff decisions are final.</strong> You can appeal in Discord.</li>
+        </ol>
+        <h2>Punishments</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Offence</th><th>First</th><th>Repeat</th></tr></thead>
+          <tbody>
+            <tr><td>Spam</td><td>Warning</td><td>1h mute</td></tr>
+            <tr><td>Harassment</td><td>24h mute</td><td>7d ban</td></tr>
+            <tr><td>Griefing</td><td>3d ban</td><td>Permanent</td></tr>
+            <tr><td>Cheating</td><td>14d ban</td><td>Permanent</td></tr>
+          </tbody>
+        </table></div>`
+    },
+    {
+      id: 'faq', cat: 'Getting started', title: 'FAQ',
+      lede: 'Answers to the questions the holonet gets most.',
+      body: `
+        <h3>Is the server free?</h3>
+        <p>Yes. The <a href="store.html">store</a> only sells optional ranks and cosmetics.</p>
+        <h3>Can I play on Bedrock?</h3>
+        <p>Not yet. Bedrock support is on the roadmap.</p>
+        <h3>How do I report a player?</h3>
+        <p>Use <code>/report &lt;player&gt; &lt;reason&gt;</code> in game, or open a ticket in Discord.</p>
+        <h3>I bought something and didn't get it.</h3>
+        <p>Purchases can take up to 10 minutes to arrive. If it's been longer, email support with your username.</p>`
+    },
+    {
+      id: 'factions', cat: 'Gameplay', title: 'Factions',
+      lede: 'Pledge to a faction at level 10 to unlock its abilities, gear and home base.',
+      body: `
+        <div class="table-wrap"><table>
+          <thead><tr><th>Faction</th><th>Home world</th><th>Specialty</th></tr></thead>
+          <tbody>
+            <tr><td>Jedi Order</td><td>Coruscant</td><td>Defensive Force powers, blue and green sabers</td></tr>
+            <tr><td>Sith Empire</td><td>Korriban</td><td>Offensive Force powers, red sabers</td></tr>
+            <tr><td>Bounty Hunters' Guild</td><td>Nar Shaddaa</td><td>Blasters, jetpacks, contract board</td></tr>
+            <tr><td>Smugglers' Syndicate</td><td>Tatooine</td><td>Ships, trading bonuses, hidden cargo</td></tr>
+          </tbody>
+        </table></div>
+        <h2>Switching factions</h2>
+        <p>You can change factions once every 30 days with <code>/faction leave</code>. You keep your items but lose faction reputation.</p>
+        <p>See also: <a href="#/lightsabers">Lightsabers &amp; kyber crystals</a>.</p>`
+    },
+    {
+      id: 'lightsabers', cat: 'Gameplay', title: 'Lightsabers & kyber crystals',
+      lede: 'Build your own blade from a hilt, a kyber crystal and an emitter.',
+      body: `
+        <h2>Crafting a saber</h2>
+        <ol>
+          <li>Find or buy a <strong>hilt</strong> at any faction armoury.</li>
+          <li>Mine a <strong>kyber crystal</strong> in the Ilum caves.</li>
+          <li>Combine them at a <strong>Saber Workbench</strong>.</li>
+        </ol>
+        <h2>Crystal colours</h2>
+        <ul>
+          <li><strong>Blue / green</strong>: common, found on Ilum</li>
+          <li><strong>Purple</strong>: rare, about a 2% drop chance</li>
+          <li><strong>Red</strong>: Sith only, made by bleeding a crystal at the Korriban altar</li>
+        </ul>
+        <h2>Combat basics</h2>
+        <p>Right-click to block, sprint-attack to lunge, and sneak + right-click to throw your saber. Blocking at the right moment deflects blaster bolts.</p>`
+    },
+    {
+      id: 'ships', cat: 'Gameplay', title: 'Ships & travel',
+      lede: 'Hop between planets by shuttle, or fly your own ship.',
+      body: `
+        <p>Public shuttles leave every station every 5 minutes. Use <code>/travel</code> to see the routes.</p>
+        <h2>Owning a ship</h2>
+        <p>Ships are bought from shipyards with credits or unlocked through faction rank. Park them in a hangar with <code>/ship dock</code>.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Class</th><th>Seats</th><th>Cargo</th></tr></thead>
+          <tbody>
+            <tr><td>Speeder bike</td><td>1</td><td>None</td></tr>
+            <tr><td>Starfighter</td><td>1</td><td>9 slots</td></tr>
+            <tr><td>Light freighter</td><td>4</td><td>54 slots</td></tr>
+          </tbody>
+        </table></div>`
+    },
+    {
+      id: 'economy', cat: 'Gameplay', title: 'Economy & credits',
+      lede: 'Credits are the galactic currency. Earn them, trade them, and try not to owe the Hutts.',
+      body: `
+        <h2>Earning credits</h2>
+        <ul>
+          <li>Completing bounties and faction missions</li>
+          <li>Selling ore and loot to cantina vendors</li>
+          <li>Trading with other players through <code>/trade</code></li>
+        </ul>
+        <h2>Spending credits</h2>
+        <p>Use credits on ships, hilts, housing on Coruscant and auction house listings (<code>/ah</code>).</p>`
+    },
+    {
+      id: 'commands', cat: 'Reference', title: 'Commands',
+      lede: 'The commands every traveller should know.',
+      body: `
+        <div class="table-wrap"><table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>/spawn</code></td><td>Return to the Outer Rim Station</td></tr>
+            <tr><td><code>/sethome &lt;name&gt;</code></td><td>Save your current location</td></tr>
+            <tr><td><code>/home &lt;name&gt;</code></td><td>Teleport to a saved home</td></tr>
+            <tr><td><code>/travel</code></td><td>Open the shuttle route map</td></tr>
+            <tr><td><code>/faction</code></td><td>Faction info, join and leave</td></tr>
+            <tr><td><code>/bal</code></td><td>Check your credits</td></tr>
+            <tr><td><code>/trade &lt;player&gt;</code></td><td>Start a trade</td></tr>
+            <tr><td><code>/ah</code></td><td>Open the auction house</td></tr>
+            <tr><td><code>/report &lt;player&gt; &lt;reason&gt;</code></td><td>Report a player to staff</td></tr>
+          </tbody>
+        </table></div>`
+    },
+    {
+      id: 'planets', cat: 'Reference', title: 'Planets',
+      lede: 'The worlds you can visit, and what you can find there.',
+      body: `
+        <h3>Tatooine</h3>
+        <p>Desert world with twin suns. Home to Mos Eisley, the podracing circuit and the Smugglers' Syndicate.</p>
+        <h3>Coruscant</h3>
+        <p>City-planet and Jedi Order headquarters. Player housing and the main auction house are here.</p>
+        <h3>Ilum</h3>
+        <p>Frozen world riddled with kyber crystal caves. Bring warm gear: the cold drains hunger fast.</p>
+        <h3>Korriban</h3>
+        <p>Ancient Sith tombs full of dangerous mobs and rare loot.</p>
+        <h3>Nar Shaddaa</h3>
+        <p>The Smugglers' Moon. Bounty contracts, black markets and very little law.</p>`
+    },
+    {
+      id: 'ranks', cat: 'Reference', title: 'Ranks & perks',
+      lede: 'Supporter ranks from the store and what each one unlocks.',
+      body: `
+        <div class="table-wrap"><table>
+          <thead><tr><th>Rank</th><th>Homes</th><th>Highlights</th></tr></thead>
+          <tbody>
+            <tr><td>Padawan</td><td>3</td><td>Chat prefix, <code>/hat</code>, <code>/nick</code></td></tr>
+            <tr><td>Jedi Knight</td><td>6</td><td>Hub flight, saber trail, priority queue</td></tr>
+            <tr><td>Jedi Master</td><td>Unlimited</td><td>Council chat, custom hilt slot</td></tr>
+            <tr><td>Sith Lord</td><td>Unlimited</td><td>Red saber, Force lightning particle</td></tr>
+          </tbody>
+        </table></div>
+        <p>Ranks are available in the <a href="store.html">store</a>.</p>`
+    }
+  ];
+  const CATS = [...new Set(ARTICLES.map(a => a.cat))];
+  const byId = Object.fromEntries(ARTICLES.map(a => [a.id, a]));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const textOf = html => {
+    // Separate block elements so headings, list items and cells don't run together.
+    const d = document.createElement('div');
+    d.innerHTML = html.replace(/<\/(h\d|li|td|th)>/g, ' · </$1>').replace(/<\/(p|div|ol|ul|table)>/g, ' </$1>');
+    return d.textContent.replace(/\s+/g, ' ').replace(/(\s·)+\s*$/, '').trim();
+  };
+  ARTICLES.forEach(a => { a.text = textOf(a.body); a.hay = [a.title, a.cat, a.lede, a.text].join(' ').toLowerCase(); });
+
+  // Twinkling stars (same seeded layout as the 404 page)
+  (function () {
+    let s = 7, html = '';
+    const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    for (let i = 0; i < 40; i++) {
+      const sz = r() > 0.8 ? 3 : 2, x = r() * 50, y = r() * 100, d = 2 + r() * 3, dl = r() * 3;
+      for (const off of [0, 50]) html += `<div class="star" style="left:${x + off}%;top:${y}%;width:${sz}px;height:${sz}px;animation:twinkle ${d}s ease-in-out ${dl}s infinite"></div>`;
+    }
+    document.getElementById('twinkle').innerHTML = html;
+  })();
+
+  // Socials
+  const SOCIALS = [
+    ['X / Twitter', 'x', 'https://x.com/tgb_mc'],
+    ['TikTok', 'tiktok', 'https://www.tiktok.com/@thegalaxybeyond'],
+    ['Instagram', 'instagram', 'https://www.instagram.com/thegalaxybeyondmc'],
+    ['Facebook', 'facebook', 'https://www.facebook.com/profile.php?id=61595066292636'],
+    ['YouTube', 'youtube', 'https://www.youtube.com/@The.Galaxy.Beyond'],
+    ['Discord', 'discord', 'https://discord.gg/knKSRP4NbQ']
+  ];
+  document.getElementById('socials').innerHTML = SOCIALS.map(([label, slug, href]) =>
+    `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg)"></span></a>`
+  ).join('');
+
+  const toc = document.getElementById('toc');
+  const sidebar = document.getElementById('sidebar');
+  const tocToggle = document.getElementById('tocToggle');
+  const articleEl = document.getElementById('article');
+  const searchEl = document.getElementById('search');
+  const clearEl = document.getElementById('clearSearch');
+
+  toc.innerHTML = CATS.map(c => `
+    <div class="toc-group">
+      <h4>${esc(c)}</h4>
+      <ul>${ARTICLES.filter(a => a.cat === c).map(a => `<li><a href="#/${a.id}" data-id="${a.id}">${esc(a.title)}</a></li>`).join('')}</ul>
+    </div>`).join('');
+
+  const currentId = () => { const id = location.hash.replace(/^#\/?/, ''); return byId[id] ? id : ARTICLES[0].id; };
+
+  function showArticle(id) {
+    const a = byId[id], i = ARTICLES.indexOf(a);
+    const prev = ARTICLES[i - 1], next = ARTICLES[i + 1];
+    document.title = `${a.title} · Wiki · The Galaxy Beyond`;
+    toc.querySelectorAll('a').forEach(l => l.dataset.id === id ? l.setAttribute('aria-current', 'page') : l.removeAttribute('aria-current'));
+    articleEl.innerHTML = `
+      <div class="crumbs mono"><a href="#/${ARTICLES[0].id}">Wiki</a> / ${esc(a.cat)}</div>
+      <h1>${esc(a.title)}</h1>
+      <p class="lede">${esc(a.lede)}</p>
+      <div class="body">${a.body}</div>
+      <div class="meta mono">Spotted something wrong? Tell us in <a href="https://discord.gg/knKSRP4NbQ" target="_blank" rel="noopener">Discord</a>.</div>
+      <nav class="pager" aria-label="More articles">
+        ${prev ? `<a class="prev" href="#/${prev.id}"><small>← Previous</small>${esc(prev.title)}</a>` : ''}
+        ${next ? `<a class="next" href="#/${next.id}"><small>Next →</small>${esc(next.title)}</a>` : ''}
+      </nav>`;
+  }
+
+  function highlight(text, words) {
+    let out = esc(text);
+    for (const w of words) out = out.replace(new RegExp(esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), m => `<mark>${m}</mark>`);
+    return out;
+  }
+  function snippet(a, words) {
+    const t = a.text, pos = t.toLowerCase().indexOf(words[0]);
+    if (pos < 0) return a.lede;
+    let start = Math.max(0, pos - 60), end = Math.min(t.length, pos + 140);
+    if (start) start = t.indexOf(' ', start) + 1 || start;
+    if (end < t.length) end = t.lastIndexOf(' ', end) > pos ? t.lastIndexOf(' ', end) : end;
+    return (start ? '…' : '').concat(t.slice(start, end).replace(/^·\s*/, '')) + (end < t.length ? '…' : '');
+  }
+  function showResults(q) {
+    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    const hits = ARTICLES.filter(a => words.every(w => a.hay.includes(w)))
+      .sort((x, y) => words.filter(w => y.title.toLowerCase().includes(w)).length - words.filter(w => x.title.toLowerCase().includes(w)).length);
+    toc.querySelectorAll('a').forEach(l => l.removeAttribute('aria-current'));
+    document.title = 'Search · Wiki · The Galaxy Beyond';
+    articleEl.innerHTML = hits.length
+      ? `<div class="results-meta mono">${hits.length} result${hits.length === 1 ? '' : 's'} for "${esc(q)}"</div>` +
+        hits.map(a => `<a class="result" href="#/${a.id}">
+          <div class="r-cat">${esc(a.cat)}</div>
+          <div class="r-title">${highlight(a.title, words)}</div>
+          <div class="r-snip">${highlight(snippet(a, words), words)}</div>
+        </a>`).join('')
+      : `<div class="empty"><div class="big">No signal</div><p>Nothing in the archives matches "${esc(q)}".</p></div>`;
+  }
+
+  function render() {
+    const q = searchEl.value.trim();
+    clearEl.hidden = !searchEl.value;
+    q ? showResults(q) : showArticle(currentId());
+  }
+
+  function onNavigate() {
+    // Following a link out of the search results drops the search.
+    if (searchEl.value) { searchEl.value = ''; clearEl.hidden = true; }
+    sidebar.classList.remove('open'); tocToggle.setAttribute('aria-expanded', 'false');
+    render();
+    articleEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  function go(hash) {
+    // Linking to the article already in the URL fires no hashchange, so handle it directly.
+    if (location.hash === hash) onNavigate(); else location.hash = hash;
+  }
+  window.addEventListener('hashchange', onNavigate);
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#/"]');
+    if (a && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); go(a.getAttribute('href')); }
+  });
+  searchEl.addEventListener('input', render);
+  const clearSearch = () => { searchEl.value = ''; render(); searchEl.focus(); };
+  clearEl.onclick = clearSearch;
+  searchEl.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && searchEl.value) clearSearch();
+    if (e.key === 'Enter') { const first = articleEl.querySelector('.result'); if (first) go(first.getAttribute('href')); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) { e.preventDefault(); searchEl.focus(); }
+  });
+  tocToggle.onclick = () => {
+    const open = sidebar.classList.toggle('open');
+    tocToggle.setAttribute('aria-expanded', String(open));
+  };
+
+  document.getElementById('copyIp').onclick = e => {
+    const el = e.currentTarget, ip = 'play.thegalaxybeyond.net';
+    const done = () => { el.textContent = 'Copied!'; setTimeout(() => el.textContent = ip, 1200); };
+    if (navigator.clipboard) navigator.clipboard.writeText(ip).then(done, () => {});
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
