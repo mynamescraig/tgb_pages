@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 · The Galaxy Beyond</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; background: #07080c; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #e8e6df;
+      font-family: 'Oxanium', sans-serif;
+      background: radial-gradient(ellipse at 50% 120%, #1a2240 0%, #07080c 60%);
+    }
+    a { color: #f2d24b; text-decoration: none; }
+    .mono { font-family: 'Share Tech Mono', monospace; letter-spacing: 4px; color: #8a8fa3; text-transform: uppercase; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 24px clamp(20px, 4vw, 48px); flex-wrap: wrap; }
+    header .brand { display: flex; flex-direction: column; gap: 4px; color: #e8e6df; }
+    header .brand span:first-child { font-size: 13px; }
+    header .brand span:last-child { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+    header .ip { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: #8a8fa3; }
+    main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 28px; padding: 24px; }
+    h1 { margin: 0; font-weight: 800; font-size: clamp(80px, 17vw, 200px); line-height: 1; letter-spacing: 0.04em; color: #f2d24b; text-shadow: 0 0 24px rgba(242, 210, 75, .35); }
+    .lead { margin: 0; max-width: 640px; font-size: clamp(24px, 3vw, 32px); line-height: 1.25; }
+    .sub { margin: 0; max-width: 560px; font-size: 20px; color: #8a8fa3; line-height: 1.4; }
+    .buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .btn {
+      font-weight: 600; font-size: 16px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 18px 28px; color: #e8e6df; background: #1b2034;
+      clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    }
+    .btn.primary { background: #f2d24b; color: #07080c; }
+    .btn:hover { background: #fff3b0; color: #07080c; }
+    .btn:not(.primary):hover { background: #262d48; color: #fff; }
+    footer {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 32px 24px; background: rgba(27, 32, 52, .6); border-top: 1px solid #2a3150; text-align: center;
+    }
+    footer .note { font-size: 14px; color: #6b7088; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <span class="mono">Holonet Relay</span>
+      <span>The Galaxy Beyond</span>
+    </a>
+    <div class="ip">play.thegalaxybeyond.net</div>
+  </header>
+
+  <main>
+    <div class="mono">Holonet error · Transmission lost</div>
+    <h1>404</h1>
+    <p class="lead">These aren't the web pages you're looking for.</p>
+    <p class="sub">The holonet couldn't find a record at this address. The page may have been moved or purged from the archives, or the link was mistyped.</p>
+    <div class="buttons">
+      <a class="btn primary" href="/">Back to homepage</a>
+      <a class="btn" href="mailto:support@thegalaxybeyond.net">Contact support</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="mono">Support</div>
+    <a href="mailto:support@thegalaxybeyond.net">support@thegalaxybeyond.net</a>
+    <div class="note">A fan-made server. Not affiliated with Lucasfilm, Disney or Mojang.</div>
+  </footer>
+</body>
+</html>
