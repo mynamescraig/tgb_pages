@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Store · The Galaxy Beyond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080c;
+    --panel: #1b2034;
+    --panel-hover: #262d48;
+    --line: #2a3150;
+    --text: #e8e6df;
+    --muted: #8a8fa3;
+    --faint: #6b7088;
+    --gold: #f2d24b;
+    --gold-hi: #fff3b0;
+    --blue: #3fb4ea;
+    --red: #e5484d;
+    --cut: polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+    --cut-sm: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body { color: var(--text); font-family: 'Oxanium', sans-serif; }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { color: var(--gold-hi); }
+  button { font-family: inherit; cursor: pointer; border: 0; }
+  .mono { font-family: 'Share Tech Mono', monospace; }
+
+  @keyframes twinkle { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+  @keyframes drift { from { background-position: 0 0 } to { background-position: -340px 0 } }
+  @keyframes driftX { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+  @keyframes glow { 0%,100% { opacity: .7 } 50% { opacity: 1 } }
+  @keyframes holoFlicker { 0%,100% { opacity: 1 } 46% { opacity: 1 } 48% { opacity: .93 } 50% { opacity: 1 } 81% { opacity: 1 } 83% { opacity: .96 } 85% { opacity: 1 } }
+  @keyframes holoRoll { from { transform: translateY(-30vh) } to { transform: translateY(130vh) } }
+  @keyframes holoLines { from { background-position: 0 0 } to { background-position: 0 6px } }
+  @keyframes hum { 0%,100% { filter: brightness(1) } 50% { filter: brightness(1.25) } }
+
+  .page { position: relative; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* Background layers (same as 404) */
+  .bg-glow, .bg-stars, .bg-twinkle { position: absolute; inset: 0; pointer-events: none; }
+  .bg-glow { background: radial-gradient(ellipse at 50% 120%, #1a2240 0%, #07080c 60%); animation: glow 9s ease-in-out infinite; }
+  .bg-stars {
+    background-image:
+      radial-gradient(1px 1px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 120px 80px,#cfd8ff,transparent),
+      radial-gradient(2px 2px at 200px 160px,#fff,transparent),
+      radial-gradient(1px 1px at 310px 50px,#fff,transparent),
+      radial-gradient(1px 1px at 60px 210px,#ffe9c4,transparent),
+      radial-gradient(2px 2px at 260px 260px,#fff,transparent);
+    background-size: 340px 300px; opacity: .8; animation: drift 60s linear infinite;
+  }
+  .bg-twinkle { overflow: hidden; }
+  .bg-twinkle .track { position: absolute; top: 0; bottom: 0; left: 0; width: 200%; animation: driftX 240s linear infinite; }
+  .bg-twinkle .star { position: absolute; background: #fff; }
+
+  .holo { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; animation: holoFlicker 7s ease-in-out infinite; }
+  .holo > div { position: absolute; }
+  .holo .tint { inset: 0; background: #4fb8ff; mix-blend-mode: color; opacity: .066; }
+  .holo .lines { inset: 0; opacity: .12; animation: holoLines .6s linear infinite;
+    background-image: repeating-linear-gradient(0deg, rgba(120,200,255,.10) 0px, rgba(120,200,255,.10) 1px, transparent 1px, transparent 3px, rgba(0,0,0,.35) 3px, rgba(0,0,0,.35) 4px, transparent 4px, transparent 6px); }
+  .holo .roll { left: 0; right: 0; top: 0; height: 18vh; opacity: .12; animation: holoRoll 6s linear infinite;
+    background: linear-gradient(180deg, transparent, rgba(140,210,255,.10) 50%, transparent); }
+  .holo .vignette { inset: 0; box-shadow: inset 0 0 160px rgba(60,160,255,.25); opacity: .12; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+  }
+
+  /* Header */
+  header { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 24px clamp(16px,4vw,48px); flex-wrap: wrap; }
+  .brand { display: flex; flex-direction: column; gap: 4px; color: var(--text); }
+  .brand:hover { color: var(--text); }
+  .brand .kicker { font-size: 13px; letter-spacing: 4px; color: var(--muted); }
+  .brand .name { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .server-ip { font-size: 16px; color: var(--muted); background: none; padding: 0; }
+  .server-ip:hover { color: var(--text); }
+  .cart-btn { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 12px 18px; background: var(--panel); color: var(--text); clip-path: var(--cut-sm); }
+  .cart-btn:hover { background: var(--panel-hover); color: #fff; }
+  .cart-count { min-width: 22px; padding: 2px 6px; background: var(--gold); color: var(--bg); font-family: 'Share Tech Mono', monospace; font-size: 13px; text-align: center; }
+
+  /* Hero */
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 32px clamp(16px,4vw,48px) 16px; }
+  .hero .kicker { font-size: 18px; letter-spacing: 5px; color: var(--muted); text-transform: uppercase; }
+  .hero h1 { margin: 0; font-weight: 800; font-size: clamp(56px,11vw,128px); line-height: 1; letter-spacing: .04em; color: var(--gold); text-shadow: 0 0 24px rgba(242,210,75,.35); text-transform: uppercase; }
+  .hero p { margin: 0; max-width: 620px; font-size: 20px; color: var(--muted); line-height: 1.4; text-wrap: pretty; }
+  .notice { font-size: 14px; letter-spacing: 1px; color: var(--blue); border: 1px dashed rgba(63,180,234,.5); padding: 8px 14px; }
+
+  /* Tabs */
+  .tabs { position: relative; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 16px clamp(16px,4vw,48px) 8px; }
+  .tab { font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; background: var(--panel); color: var(--text); clip-path: var(--cut-sm); }
+  .tab:hover { background: var(--panel-hover); }
+  .tab[aria-pressed="true"] { background: var(--gold); color: var(--bg); }
+
+  /* Grid */
+  main { position: relative; flex: 1; width: 100%; max-width: 1240px; margin: 0 auto; padding: 24px clamp(16px,4vw,48px) 64px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .card { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 22px; background: rgba(27,32,52,.72); border: 1px solid var(--line);
+    clip-path: var(--cut); transition: background .15s, border-color .15s; }
+  .card:hover { background: rgba(38,45,72,.85); border-color: #3a4370; }
+  .card.featured { border-color: rgba(242,210,75,.55); box-shadow: inset 0 0 40px rgba(242,210,75,.06); }
+  .card .tag { position: absolute; top: 14px; right: 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 8px; background: var(--gold); color: var(--bg); }
+  .card .tag.sith { background: var(--red); color: #fff; }
+  .card .icon { width: 64px; height: 64px; display: grid; place-items: center; background: #0d1020; border: 1px solid var(--line); clip-path: var(--cut-sm); }
+  .card .icon svg { width: 36px; height: 36px; }
+  .card .cat { font-size: 12px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .card h3 { margin: 0; font-weight: 800; font-size: 22px; letter-spacing: 1px; text-transform: uppercase; }
+  .card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; color: #c4c6d0; font-size: 15px; line-height: 1.35; flex: 1; }
+  .card li { padding-left: 16px; position: relative; }
+  .card li::before { content: ''; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; background: var(--blue); }
+  .card .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .price { display: flex; flex-direction: column; }
+  .price .amt { font-weight: 800; font-size: 26px; color: var(--gold); }
+  .price .was { font-size: 13px; color: var(--faint); text-decoration: line-through; }
+  .add { white-space: nowrap; font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; background: var(--gold); color: var(--bg); clip-path: var(--cut-sm); }
+  .add:hover { background: var(--gold-hi); }
+  .add.added { background: var(--blue); color: var(--bg); }
+
+  /* Cart drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(4,5,8,.7); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: #0c0f1a; border-left: 1px solid var(--line); z-index: 61;
+    display: flex; flex-direction: column; transform: translateX(100%); transition: transform .25s ease; }
+  body.cart-open .scrim { opacity: 1; pointer-events: auto; }
+  body.cart-open .drawer { transform: none; }
+  .drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; border-bottom: 1px solid var(--line); }
+  .drawer-head h2 { margin: 0; font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+  .close { background: none; color: var(--muted); font-size: 28px; line-height: 1; padding: 4px 8px; }
+  .close:hover { color: var(--text); }
+  .cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .cart-empty { color: var(--muted); text-align: center; padding: 48px 0; }
+  .line { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px; background: var(--panel); clip-path: var(--cut-sm); }
+  .line .n { font-weight: 600; }
+  .line .p { color: var(--gold); font-size: 14px; }
+  .qty { display: flex; align-items: center; gap: 8px; }
+  .qty button { width: 28px; height: 28px; background: #0d1020; color: var(--text); font-size: 16px; }
+  .qty button:hover { background: var(--panel-hover); }
+  .drawer-foot { padding: 20px 24px 24px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .field input { font-family: 'Share Tech Mono', monospace; font-size: 16px; padding: 12px 14px; background: #0d1020; border: 1px solid var(--line); color: var(--text); outline: none; }
+  .field input:focus { border-color: var(--gold); }
+  .total { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; }
+  .total strong { font-size: 26px; color: var(--gold); }
+  .checkout { font-weight: 600; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; padding: 18px 28px; background: var(--gold); color: var(--bg); clip-path: var(--cut); }
+  .checkout:hover { background: var(--gold-hi); }
+  .checkout:disabled { background: var(--panel); color: var(--faint); cursor: not-allowed; }
+  .toast { font-size: 14px; color: var(--blue); min-height: 1.2em; text-align: center; }
+
+  /* Footer (same as 404) */
+  footer { position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 32px clamp(16px,4vw,48px) 24px; background: rgba(27,32,52,.6); border-top: 1px solid var(--line); text-align: center; }
+  .foot-groups { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .foot-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .foot-label { font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+  .socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .socials a { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--panel); clip-path: var(--cut-sm); }
+  .socials a:hover { background: var(--gold); }
+  .socials span { width: 22px; height: 22px; display: block; background: var(--text); -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+  .support { font-size: 18px; font-weight: 600; }
+  .disclaimer { font-size: 14px; color: var(--faint); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bg-glow"></div>
+  <div class="bg-stars"></div>
+  <div class="bg-twinkle"><div class="track" id="twinkle"></div></div>
+
+  <header>
+    <a class="brand" href="https://thegalaxybeyond.net/">
+      <span class="kicker mono">HOLONET RELAY</span>
+      <span class="name">The Galaxy Beyond</span>
+    </a>
+    <div class="header-right">
+      <button class="server-ip mono" id="copyIp" title="Copy server address">play.thegalaxybeyond.net</button>
+      <button class="cart-btn" id="openCart" aria-label="Open cart">Cart <span class="cart-count" id="cartCount">0</span></button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="kicker mono">Holonet trade terminal · Outer Rim Exchange</div>
+    <h1>Store</h1>
+    <p>Ranks, crates and cosmetics to fly your colors across the galaxy. Every purchase helps keep the servers running.</p>
+    <div class="notice mono">PREVIEW · Items and prices are placeholders. Checkout is offline.</div>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Store categories"></nav>
+
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>
+    <div class="foot-groups">
+      <div class="foot-group">
+        <div class="foot-label mono">Follow the transmission</div>
+        <nav class="socials" id="socials"></nav>
+      </div>
+      <div class="foot-group" style="gap:8px;">
+        <div class="foot-label mono">Support</div>
+        <a class="support" href="mailto:support@thegalaxybeyond.net">support@thegalaxybeyond.net</a>
+      </div>
+    </div>
+    <div class="disclaimer">A fan-made server. Not affiliated with Lucasfilm, Disney or Mojang.</div>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Cargo hold</h2>
+    <button class="close" id="closeCart" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="drawer-foot">
+    <div class="field">
+      <label for="ign" class="mono">Minecraft username</label>
+      <input id="ign" placeholder="e.g. Skywalker_99" autocomplete="off" spellcheck="false" maxlength="16">
+    </div>
+    <div class="total"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
+    <button class="checkout" id="checkout" disabled>Checkout</button>
+    <div class="toast mono" id="toast"></div>
+  </div>
+</aside>
+
+<div class="holo" aria-hidden="true">
+  <div class="tint"></div><div class="lines"></div><div class="roll"></div><div class="vignette"></div>
+</div>
+
+<script>
+(function () {
+  // Placeholder catalogue — swap for real items/prices later.
+  const ICONS = {
+    rank: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.6 6.5 19.5l1-6.3L3 8.9 9 8z"/></svg>',
+    saber: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20l3-3M7 17l2 2M9 15l10-10" stroke-width="2.4"/><path d="M6 16l2 2"/></svg>',
+    crate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>',
+    ship: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 8 7 3-7 2-3 7-3-7-7-2 7-3z"/></svg>',
+    credits: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.6-1-1.7-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.3 0-2.4-.5-3-1.5M12 6v2M12 16v2"/></svg>',
+    pet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="6" width="12" height="10" rx="5"/><circle cx="12" cy="11" r="2"/><path d="M9 16v4M15 16v4M12 3v3"/></svg>'
+  };
+  const COLORS = { rank: '#f2d24b', saber: '#3fb4ea', crate: '#e8e6df', ship: '#9b8cff', credits: '#f2d24b', pet: '#6fdc8c' };
+
+  const ITEMS = [
+    { id: 'padawan', cat: 'Ranks', icon: 'rank', name: 'Padawan', price: 4.99, perks: ['[Padawan] chat prefix', '2 extra homes', '/hat and /nick', 'Monthly starter kit'] },
+    { id: 'knight', cat: 'Ranks', icon: 'rank', name: 'Jedi Knight', price: 12.99, tag: 'Popular', featured: true, perks: ['Everything in Padawan', '5 extra homes', '/fly in hub worlds', 'Green saber trail', 'Priority queue'] },
+    { id: 'master', cat: 'Ranks', icon: 'rank', name: 'Jedi Master', price: 24.99, was: 29.99, perks: ['Everything in Jedi Knight', 'Unlimited homes', 'Council chat channel', 'Custom saber hilt slot', 'Monthly legendary key'] },
+    { id: 'sith', cat: 'Ranks', icon: 'rank', name: 'Sith Lord', price: 24.99, tag: 'Dark side', tagClass: 'sith', perks: ['Everything in Jedi Knight', 'Red saber + Force lightning particle', 'Unlimited homes', 'Sinister join message'] },
+
+    { id: 'kyber-blue', cat: 'Cosmetics', icon: 'saber', name: 'Blue Kyber Crystal', price: 2.99, perks: ['Blue saber blade colour', 'Hum sound pack', 'Works on all hilts'] },
+    { id: 'kyber-purple', cat: 'Cosmetics', icon: 'saber', name: 'Purple Kyber Crystal', price: 3.99, perks: ['Rare purple blade colour', 'Unique ignition sound'] },
+    { id: 'darksaber', cat: 'Cosmetics', icon: 'saber', name: 'Darksaber Hilt', price: 9.99, tag: 'Limited', featured: true, perks: ['Mandalorian hilt model', 'Flat black blade with white edge', 'Only 500 forged'] },
+    { id: 'astromech', cat: 'Cosmetics', icon: 'pet', name: 'Astromech Companion', price: 5.99, perks: ['Follows you around', 'Beeps on kills', '4 paint jobs'] },
+
+    { id: 'supply', cat: 'Crates', icon: 'crate', name: 'Supply Crate Key', price: 0.99, perks: ['1 key for a Supply Crate', 'Common gear and credits'] },
+    { id: 'smuggler', cat: 'Crates', icon: 'crate', name: 'Smuggler Crate ×5', price: 3.99, perks: ['5 Smuggler Crate keys', 'Chance at blaster skins', 'Hidden compartment bonus'] },
+    { id: 'holocron', cat: 'Crates', icon: 'crate', name: 'Holocron Crate ×3', price: 7.99, tag: 'Best value', featured: true, perks: ['3 legendary Holocron keys', 'Exclusive cosmetic pool', 'Guaranteed rare on first open'] },
+
+    { id: 'speeder', cat: 'Ships', icon: 'ship', name: '74-Z Speeder Bike', price: 6.99, perks: ['Ground mount', 'Boost ability', 'Endor forest paint'] },
+    { id: 'freighter', cat: 'Ships', icon: 'ship', name: 'Light Freighter', price: 14.99, perks: ['Rideable ship for 4 players', 'Cargo hold storage', 'Made the run in under 12 parsecs'] },
+
+    { id: 'cr-1k', cat: 'Credits', icon: 'credits', name: '1,000 Credits', price: 1.99, perks: ['In-game currency', 'Spend at any cantina vendor'] },
+    { id: 'cr-6k', cat: 'Credits', icon: 'credits', name: '6,000 Credits', price: 9.99, was: 11.94, perks: ['In-game currency', '+20% bonus credits'] },
+    { id: 'cr-15k', cat: 'Credits', icon: 'credits', name: '15,000 Credits', price: 19.99, tag: '+50%', perks: ['In-game currency', '+50% bonus credits', 'Bounty board discount'] }
+  ];
+  const CATS = ['All', ...new Set(ITEMS.map(i => i.cat))];
+  const money = n => '$' + n.toFixed(2);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // Twinkling stars (same seeded layout as the 404 page)
+  (function () {
+    const track = document.getElementById('twinkle');
+    let s = 7;
+    const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    let html = '';
+    for (let i = 0; i < 40; i++) {
+      const sz = r() > 0.8 ? 3 : 2, x = r() * 50, y = r() * 100, d = 2 + r() * 3, dl = r() * 3;
+      for (const off of [0, 50]) html += `<div class="star" style="left:${x + off}%;top:${y}%;width:${sz}px;height:${sz}px;animation:twinkle ${d}s ease-in-out ${dl}s infinite"></div>`;
+    }
+    track.innerHTML = html;
+  })();
+
+  // Socials
+  const SOCIALS = [
+    ['X / Twitter', 'x', 'https://x.com/tgb_mc'],
+    ['TikTok', 'tiktok', 'https://www.tiktok.com/@thegalaxybeyond'],
+    ['Instagram', 'instagram', 'https://www.instagram.com/thegalaxybeyondmc'],
+    ['Facebook', 'facebook', 'https://www.facebook.com/profile.php?id=61595066292636'],
+    ['YouTube', 'youtube', 'https://www.youtube.com/@The.Galaxy.Beyond'],
+    ['Discord', 'discord', 'https://discord.gg/knKSRP4NbQ']
+  ];
+  document.getElementById('socials').innerHTML = SOCIALS.map(([label, slug, href]) =>
+    `<a href="${href}" target="_blank" rel="noopener" title="${label}" aria-label="${label}"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${slug}.svg)"></span></a>`
+  ).join('');
+
+  // Cart state (kept per-browser so a refresh doesn't wipe it)
+  let cart = {};
+  try { cart = JSON.parse(localStorage.getItem('tgb-cart') || '{}') || {}; } catch (e) { cart = {}; }
+  for (const id of Object.keys(cart)) if (!ITEMS.some(i => i.id === id)) delete cart[id];
+  const save = () => { try { localStorage.setItem('tgb-cart', JSON.stringify(cart)); } catch (e) {} };
+
+  let active = 'All';
+  const tabs = document.getElementById('tabs');
+  const grid = document.getElementById('grid');
+
+  function renderTabs() {
+    tabs.innerHTML = CATS.map(c => `<button class="tab" data-cat="${c}" aria-pressed="${c === active}">${c}</button>`).join('');
+  }
+  function renderGrid() {
+    const list = active === 'All' ? ITEMS : ITEMS.filter(i => i.cat === active);
+    grid.innerHTML = list.map(i => `
+      <article class="card${i.featured ? ' featured' : ''}">
+        ${i.tag ? `<span class="tag mono ${i.tagClass || ''}">${esc(i.tag)}</span>` : ''}
+        <div class="icon" style="color:${COLORS[i.icon]}">${ICONS[i.icon]}</div>
+        <div>
+          <div class="cat mono">${esc(i.cat)}</div>
+          <h3>${esc(i.name)}</h3>
+        </div>
+        <ul>${i.perks.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+        <div class="foot">
+          <div class="price">
+            ${i.was ? `<span class="was mono">${money(i.was)}</span>` : ''}
+            <span class="amt">${money(i.price)}</span>
+          </div>
+          <button class="add" data-id="${i.id}">+ Add</button>
+        </div>
+      </article>`).join('');
+  }
+  function renderCart() {
+    const ids = Object.keys(cart);
+    const count = ids.reduce((n, id) => n + cart[id], 0);
+    const total = ids.reduce((n, id) => n + cart[id] * ITEMS.find(i => i.id === id).price, 0);
+    document.getElementById('cartCount').textContent = count;
+    document.getElementById('cartTotal').textContent = money(total);
+    document.getElementById('checkout').disabled = count === 0;
+    document.getElementById('cartItems').innerHTML = ids.length === 0
+      ? '<div class="cart-empty mono">Your cargo hold is empty.</div>'
+      : ids.map(id => {
+          const it = ITEMS.find(i => i.id === id);
+          return `<div class="line">
+            <div><div class="n">${esc(it.name)}</div><div class="p mono">${money(it.price * cart[id])}</div></div>
+            <div class="qty">
+              <button data-dec="${id}" aria-label="Remove one">−</button>
+              <span class="mono">${cart[id]}</span>
+              <button data-inc="${id}" aria-label="Add one">+</button>
+            </div>
+          </div>`;
+        }).join('');
+  }
+
+  tabs.addEventListener('click', e => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    active = b.dataset.cat; renderTabs(); renderGrid();
+  });
+  grid.addEventListener('click', e => {
+    const b = e.target.closest('.add'); if (!b) return;
+    cart[b.dataset.id] = (cart[b.dataset.id] || 0) + 1; save(); renderCart();
+    b.textContent = 'Added'; b.classList.add('added');
+    setTimeout(() => { b.textContent = "+ Add"; b.classList.remove('added'); }, 900);
+  });
+  document.getElementById('cartItems').addEventListener('click', e => {
+    const inc = e.target.closest('[data-inc]'), dec = e.target.closest('[data-dec]');
+    if (inc) cart[inc.dataset.inc]++;
+    if (dec && --cart[dec.dataset.dec] <= 0) delete cart[dec.dataset.dec];
+    if (inc || dec) { save(); renderCart(); }
+  });
+
+  const drawer = document.getElementById('drawer');
+  const toast = document.getElementById('toast');
+  const setOpen = open => {
+    document.body.classList.toggle('cart-open', open);
+    drawer.setAttribute('aria-hidden', String(!open));
+    if (!open) toast.textContent = '';
+  };
+  document.getElementById('openCart').onclick = () => setOpen(true);
+  document.getElementById('closeCart').onclick = () => setOpen(false);
+  document.getElementById('scrim').onclick = () => setOpen(false);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+
+  document.getElementById('checkout').onclick = () => {
+    const ign = document.getElementById('ign').value.trim();
+    if (!/^[A-Za-z0-9_]{3,16}$/.test(ign)) { toast.textContent = 'Enter a valid Minecraft username first.'; return; }
+    toast.textContent = 'Transmission jammed: checkout is not live yet.';
+  };
+
+  document.getElementById('copyIp').onclick = e => {
+    const el = e.currentTarget, ip = 'play.thegalaxybeyond.net';
+    const done = () => { el.textContent = 'Copied!'; setTimeout(() => el.textContent = ip, 1200); };
+    if (navigator.clipboard) navigator.clipboard.writeText(ip).then(done, () => {});
+  };
+
+  renderTabs(); renderGrid(); renderCart();
+})();
+</script>
+</body>
+</html>
