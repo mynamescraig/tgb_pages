@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · The Galaxy Beyond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080c;
+    --panel: #1b2034;
+    --panel-hover: #262d48;
+    --line: #2a3150;
+    --text: #e8e6df;
+    --muted: #8a8fa3;
+    --dim: #6b7088;
+    --gold: #f2d24b;
+    --gold-light: #fff3b0;
+    --holo: #3fb4ea;
+    --cut: polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+    --cut-sm: polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body {
+    color: var(--text);
+    font-family: 'Oxanium', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { color: var(--gold-light); }
+
+  @keyframes twinkle { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+  @keyframes drift { from { background-position: 0 0 } to { background-position: -340px 0 } }
+  @keyframes glow { 0%,100% { opacity: .7 } 50% { opacity: 1 } }
+  @keyframes holoFlicker { 0%,100%,46%,50%,81%,85% { opacity: 1 } 48% { opacity: .93 } 83% { opacity: .96 } }
+  @keyframes holoRoll { from { transform: translateY(-30vh) } to { transform: translateY(130vh) } }
+  @keyframes holoLines { from { background-position: 0 0 } to { background-position: 0 6px } }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(242,210,75,.55) } 50% { box-shadow: 0 0 0 6px rgba(242,210,75,0) } }
+
+  /* Background layers */
+  .bg-glow, .bg-stars, .holo { position: fixed; inset: 0; pointer-events: none; }
+  .bg-glow {
+    background: radial-gradient(ellipse at 50% 120%, #1a2240 0%, var(--bg) 60%);
+    animation: glow 9s ease-in-out infinite;
+  }
+  .bg-stars {
+    background-image:
+      radial-gradient(1px 1px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 120px 80px,#cfd8ff,transparent),
+      radial-gradient(2px 2px at 200px 160px,#fff,transparent),
+      radial-gradient(1px 1px at 310px 50px,#fff,transparent),
+      radial-gradient(1px 1px at 60px 210px,#ffe9c4,transparent),
+      radial-gradient(2px 2px at 260px 260px,#fff,transparent);
+    background-size: 340px 300px;
+    opacity: .8;
+    animation: drift 60s linear infinite, twinkle 6s ease-in-out infinite;
+  }
+  .holo { z-index: 10; overflow: hidden; animation: holoFlicker 7s ease-in-out infinite; }
+  .holo .tint { position: absolute; inset: 0; background: #4fb8ff; mix-blend-mode: color; opacity: .066; }
+  .holo .lines {
+    position: absolute; inset: 0; opacity: .12;
+    background-image: repeating-linear-gradient(0deg, rgba(120,200,255,.10) 0px, rgba(120,200,255,.10) 1px, transparent 1px, transparent 3px, rgba(0,0,0,.35) 3px, rgba(0,0,0,.35) 4px, transparent 4px, transparent 6px);
+    animation: holoLines .6s linear infinite;
+  }
+  .holo .roll {
+    position: absolute; left: 0; right: 0; top: 0; height: 18vh; opacity: .12;
+    background: linear-gradient(180deg, transparent, rgba(140,210,255,.10) 50%, transparent);
+    animation: holoRoll 6s linear infinite;
+  }
+  .holo .vignette { position: absolute; inset: 0; box-shadow: inset 0 0 160px rgba(60,160,255,.25); opacity: .12; }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-stars, .bg-glow, .holo, .holo .lines, .holo .roll, .pill.live::before { animation: none !important; }
+  }
+
+  .page { position: relative; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* Header */
+  header {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 24px clamp(16px,4vw,48px);
+  }
+  .brand { display: flex; flex-direction: column; gap: 4px; color: var(--text); }
+  .brand:hover { color: var(--text); }
+  .eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; }
+  .brand-name { font-weight: 800; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
+  .ip { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: var(--muted); }
+
+  /* Hero */
+  .hero {
+    text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: clamp(32px,6vw,72px) 16px clamp(24px,4vw,48px);
+  }
+  .hero h1 {
+    margin: 0; font-weight: 800; font-size: clamp(44px,9vw,96px); line-height: 1;
+    letter-spacing: .04em; text-transform: uppercase; color: var(--gold);
+    text-shadow: 0 0 24px rgba(242,210,75,.35);
+  }
+  .hero p { margin: 0; max-width: 640px; font-size: clamp(18px,2.4vw,22px); line-height: 1.45; color: var(--muted); text-wrap: pretty; }
+  .hero p strong { color: var(--text); font-weight: 600; }
+
+  main { flex: 1; width: 100%; max-width: 960px; margin: 0 auto; padding: 0 16px 72px; }
+
+  /* Sections */
+  .phase { margin-top: 48px; }
+  .phase-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .phase-head h2 { margin: 0; font-weight: 800; font-size: clamp(24px,3.4vw,32px); letter-spacing: 2px; text-transform: uppercase; }
+  .phase-head .eyebrow { font-size: 12px; }
+  .phase-note { margin: -8px 0 20px; color: var(--muted); font-size: 16px; line-height: 1.5; }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+  .card {
+    position: relative; background: var(--panel); clip-path: var(--cut);
+    padding: 24px; display: flex; flex-direction: column; gap: 12px;
+    transition: background .2s;
+  }
+  .card:hover { background: var(--panel-hover); }
+  .card h3 { margin: 0; font-weight: 600; font-size: 21px; letter-spacing: .5px; line-height: 1.25; }
+  .card p { margin: 0; font-size: 16px; line-height: 1.55; color: #c9c7c0; }
+  .credit { font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 1px; color: var(--muted); margin-top: auto; padding-top: 4px; }
+  .credit b { color: var(--text); font-weight: 400; }
+
+  .card.feature {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #252a1c 0%, var(--panel) 55%);
+    padding: clamp(24px,4vw,36px);
+  }
+  .card.feature::after {
+    content: ""; position: absolute; left: 0; top: 12px; bottom: 0; width: 3px; background: var(--gold);
+    box-shadow: 0 0 12px rgba(242,210,75,.6);
+  }
+  .card.feature h3 { font-size: clamp(24px,3.2vw,30px); color: var(--gold); }
+  .card.feature p { font-size: 18px; max-width: 640px; }
+
+  .pill {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 6px 10px; clip-path: var(--cut-sm); background: #11141f; color: var(--muted);
+  }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .pill.live { color: var(--gold); }
+  .pill.live::before { animation: pulse 2s ease-in-out infinite; }
+  .pill.wip { color: var(--holo); }
+  .pill.later { color: var(--dim); }
+
+  /* Horizon list */
+  .horizon { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .horizon li {
+    display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px;
+    border: 1px dashed var(--line); background: rgba(27,32,52,.35);
+  }
+  .horizon .idx { font-family: 'Share Tech Mono', monospace; color: var(--dim); font-size: 14px; padding-top: 3px; flex-shrink: 0; }
+  .horizon h3 { margin: 0 0 4px; font-weight: 600; font-size: 18px; }
+  .horizon p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+
+  /* CTA */
+  .cta {
+    margin-top: 56px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .cta p { margin: 0; font-size: 18px; color: var(--muted); max-width: 520px; line-height: 1.45; }
+  .btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    font-weight: 600; font-size: 16px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 18px 28px; clip-path: var(--cut);
+  }
+  .btn.primary { background: var(--gold); color: var(--bg); }
+  .btn.primary:hover { background: var(--gold-light); color: var(--bg); }
+  .btn.secondary { background: var(--panel); color: var(--text); }
+  .btn.secondary:hover { background: var(--panel-hover); color: #fff; }
+
+  /* Footer */
+  footer {
+    display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center;
+    padding: 32px clamp(16px,4vw,48px) 24px;
+    background: rgba(27,32,52,.6); border-top: 1px solid var(--line);
+  }
+  .foot-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .socials a {
+    display: flex; align-items: center; justify-content: center; width: 48px; height: 48px;
+    background: var(--panel); clip-path: var(--cut-sm);
+  }
+  .socials a:hover { background: var(--gold); }
+  .socials span {
+    width: 22px; height: 22px; display: block; background: var(--text);
+    -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+  }
+  .socials a:hover span { background: var(--bg); }
+  .support { font-size: 18px; font-weight: 600; }
+  .disclaimer { font-size: 14px; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-stars" aria-hidden="true"></div>
+
+<div class="page">
+  <header>
+    <a href="/" class="brand">
+      <span class="eyebrow">Holonet Relay</span>
+      <span class="brand-name">The Galaxy Beyond</span>
+    </a>
+    <div class="ip">play.thegalaxybeyond.net</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Incoming transmission · Rebel command</div>
+    <h1>Roadmap</h1>
+    <p>Our top priority right now is a brand-new start to your story: <strong>Quest 1, a prison break</strong> that gets you geared up and on your way to Tatooine.</p>
+    <p>There are no dates here on purpose. Things ship when they're ready, and we'd rather surprise you than miss a deadline.</p>
+  </section>
+
+  <main>
+    <section class="phase">
+      <div class="phase-head">
+        <h2>In progress</h2>
+        <span class="eyebrow">Active operations</span>
+      </div>
+      <div class="grid">
+        <article class="card feature">
+          <span class="pill live">Top priority</span>
+          <h3>Quest 1: The Prison Break</h3>
+          <p>You wake up in an Imperial cell. Your first adventure is getting out alive, finding food, gear, and a blaster along the way, and learning how to hold your own in a fight. Then it's off to Tatooine.</p>
+          <div class="credit">Build by <b>GoldenFeet</b></div>
+        </article>
+        <article class="card">
+          <span class="pill live">In progress</span>
+          <h3>Spawn rebuild</h3>
+          <p>A new arrival point on Tatooine, built to be the first place you see after escaping.</p>
+          <div class="credit">Built with help from <b>GoldenFeet</b></div>
+        </article>
+        <article class="card">
+          <span class="pill live">In progress</span>
+          <h3>Vehicles rework</h3>
+          <p>An overhaul of how vehicles work on TGB. More details to come as it takes shape.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="phase">
+      <div class="phase-head">
+        <h2>Also in the works</h2>
+        <span class="eyebrow">Parallel operations</span>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="pill wip">In the works</span>
+          <h3>Classes rework</h3>
+          <p>A rebalance of TGB's classes so each path feels distinct and worth choosing.</p>
+          <div class="credit">Led by <b>Spaggy</b></div>
+        </article>
+        <article class="card">
+          <span class="pill wip">In the works</span>
+          <h3>Weapons rework</h3>
+          <p>Updated weapons, starting with the blaster you'll pick up in Quest 1.</p>
+          <div class="credit">Led by <b>Spaggy</b></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="phase">
+      <div class="phase-head">
+        <h2>On the horizon</h2>
+        <span class="eyebrow">Unconfirmed intel</span>
+      </div>
+      <p class="phase-note">Ideas we're excited about but haven't started yet. They may change before they arrive.</p>
+      <ul class="horizon">
+        <li>
+          <span class="idx">01</span>
+          <div>
+            <h3>Choices in the prison break</h3>
+            <p>Side with the rebels or the officers during your escape.</p>
+          </div>
+        </li>
+        <li>
+          <span class="idx">02</span>
+          <div>
+            <h3>A more Star Wars galaxy</h3>
+            <p>Wildlife and townsfolk reworked to fit the setting, with droids instead of golems.</p>
+          </div>
+        </li>
+        <li>
+          <span class="idx">03</span>
+          <div>
+            <h3>Heat and territory</h3>
+            <p>The Empire takes notice when you cause trouble, and control of territory shifts.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="cta">
+      <p>Have an idea for the galaxy? Drop it in the suggestions channel on our Discord.</p>
+      <div class="btns">
+        <a class="btn primary" href="https://discord.gg/knKSRP4NbQ" target="_blank" rel="noopener">Join the Discord</a>
+        <a class="btn secondary" href="/">Back to homepage</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="foot-group">
+      <div class="eyebrow">Follow the transmission</div>
+      <nav class="socials">
+        <a href="https://x.com/tgb_mc" target="_blank" rel="noopener" aria-label="X / Twitter" title="X / Twitter"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/x.svg)"></span></a>
+        <a href="https://www.tiktok.com/@thegalaxybeyond" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/tiktok.svg)"></span></a>
+        <a href="https://www.instagram.com/thegalaxybeyondmc" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg)"></span></a>
+        <a href="https://www.facebook.com/profile.php?id=61595066292636" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/facebook.svg)"></span></a>
+        <a href="https://www.youtube.com/@The.Galaxy.Beyond" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/youtube.svg)"></span></a>
+        <a href="https://discord.gg/knKSRP4NbQ" target="_blank" rel="noopener" aria-label="Discord" title="Discord"><span style="--icon:url(https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg)"></span></a>
+      </nav>
+    </div>
+    <div class="foot-group" style="gap:8px">
+      <div class="eyebrow">Support</div>
+      <a class="support" href="mailto:support@thegalaxybeyond.net">support@thegalaxybeyond.net</a>
+    </div>
+    <div class="disclaimer">A fan-made server. Not affiliated with Lucasfilm, Disney or Mojang.</div>
+  </footer>
+</div>
+
+<div class="holo" aria-hidden="true">
+  <div class="tint"></div>
+  <div class="lines"></div>
+  <div class="roll"></div>
+  <div class="vignette"></div>
+</div>
+</body>
+</html>
