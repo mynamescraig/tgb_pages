@@ -147,6 +147,35 @@
   .pill.wip { color: var(--holo); }
   .pill.later { color: var(--dim); }
 
+  /* Systems (GalaxyPaths / GalaxyArmory) */
+  .system {
+    position: relative; background: var(--panel); clip-path: var(--cut);
+    padding: clamp(24px,4vw,36px); margin-bottom: 20px;
+    display: flex; flex-direction: column; gap: 24px;
+  }
+  .system::after {
+    content: ""; position: absolute; left: 0; top: 12px; bottom: 0; width: 3px; background: var(--holo);
+    box-shadow: 0 0 12px rgba(63,180,234,.6);
+  }
+  .system-head { display: flex; flex-direction: column; gap: 12px; }
+  .system h3 { margin: 0; font-weight: 800; font-size: clamp(24px,3.2vw,30px); letter-spacing: 1px; color: var(--holo); }
+  .system h3 .sub { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-left: 8px; }
+  .system .lead { margin: 0; font-size: 18px; line-height: 1.5; max-width: 680px; color: var(--text); }
+  .features { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .feat { background: #11141f; padding: 18px; clip-path: var(--cut-sm); }
+  .feat h4 { margin: 0 0 6px; font-weight: 600; font-size: 17px; }
+  .feat p { margin: 0; font-size: 15px; line-height: 1.5; color: #c9c7c0; }
+  .callout {
+    border: 1px solid rgba(242,210,75,.35); background: rgba(242,210,75,.06);
+    padding: 16px 18px; font-size: 16px; line-height: 1.5; color: #d9d6cc;
+  }
+  .callout b { color: var(--gold); font-weight: 600; }
+  .builds { display: flex; flex-direction: column; gap: 10px; }
+  .builds ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .builds li { font-size: 15px; line-height: 1.5; color: var(--muted); padding-left: 16px; position: relative; }
+  .builds li::before { content: "›"; position: absolute; left: 0; color: var(--holo); }
+  .builds li b { color: var(--text); font-weight: 600; }
+
   /* Horizon list */
   .horizon { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
   .horizon li {
@@ -246,20 +275,92 @@
         <h2>Also in the works</h2>
         <span class="eyebrow">Parallel operations</span>
       </div>
-      <div class="grid">
-        <article class="card">
-          <span class="pill wip">In the works</span>
-          <h3>Classes rework</h3>
-          <p>A rebalance of TGB's classes so each path feels distinct and worth choosing.</p>
+      <p class="phase-note">Two big systems are being designed side by side. Both are still in planning, so details may change before they reach the live server.</p>
+
+      <article class="system">
+        <div class="system-head">
+          <span class="pill wip">In planning</span>
+          <h3>GalaxyPaths <span class="sub">Classes rework</span></h3>
+          <p class="lead">No more picking one class for life. You build your own character, and you get good at what you actually do.</p>
           <div class="credit">Led by <b>Spaggy</b></div>
-        </article>
-        <article class="card">
-          <span class="pill wip">In the works</span>
-          <h3>Weapons rework</h3>
-          <p>Updated weapons, starting with the blaster you'll pick up in Quest 1.</p>
+        </div>
+        <div class="features">
+          <div class="feat">
+            <h4>Build your own path</h4>
+            <p>Spend skill points across Disciplines like Commando, Bounty Hunter, Mandalorian Arsenal or Force Adept. Master two, or mix four or five.</p>
+          </div>
+          <div class="feat">
+            <h4>Skill comes from use</h4>
+            <p>Every weapon type has its own track, from Untrained to Legend. Untrained hands are less accurate and hit softer.</p>
+          </div>
+          <div class="feat">
+            <h4>Choose your abilities</h4>
+            <p>Disciplines unlock abilities, and you equip four. Controls stay the same F-key combos you use today.</p>
+          </div>
+          <div class="feat">
+            <h4>Power through story</h4>
+            <p>The most prestigious powers come from rare Holocrons, server events and staff-run Trials. They can't be bought or handed out by other players.</p>
+          </div>
+          <div class="feat">
+            <h4>Spare, arrest or execute</h4>
+            <p>Defeated enemies can surrender. Your choices pull you toward Light or Dark and shift how factions treat you.</p>
+          </div>
+          <div class="feat">
+            <h4>Your character's story</h4>
+            <p>A record of your training, teachings, Trials passed and titles earned. Tougher enemies teach you more.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <b>Nobody starts over.</b> Your current class and progress carry across, and old class names like Jedi Guardian live on as titles you earn through your build. Everyone gets one free rebuild after the switch.
+        </div>
+        <div class="builds">
+          <span class="eyebrow">Example builds</span>
+          <ul>
+            <li><b>Clone Commando</b> · Commando + Field Medic, expert with rifles and explosives</li>
+            <li><b>Mandalorian bounty hunter</b> · Mandalorian Arsenal + Bounty Hunter + Jetpack Pilot</li>
+            <li><b>Grey Jedi duelist</b> · Force Adept + Lightsaber Combat, a saber form learned from a Holocron</li>
+            <li><b>Fallen smuggler</b> · Scoundrel + Gunslinger, later awakened to the Force through a story arc</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="system">
+        <div class="system-head">
+          <span class="pill wip">In planning</span>
+          <h3>GalaxyArmory <span class="sub">Weapons rework</span></h3>
+          <p class="lead">A rebuilt arsenal for blasters, lightsabers, grenades, vehicle guns and armor, made to feel familiar on day one and work far more reliably.</p>
           <div class="credit">Led by <b>Spaggy</b></div>
-        </article>
-      </div>
+        </div>
+        <div class="features">
+          <div class="feat">
+            <h4>Blasters, same feel</h4>
+            <p>Fast flying bolts, scopes and Q to cool off. Magazines become heat, with the same number of shots before you need to cool down.</p>
+          </div>
+          <div class="feat">
+            <h4>Better lightsabers</h4>
+            <p>Q ignites and holsters. Deflection is built in, and any two one-handed sabers can be dual-wielded as a stance.</p>
+          </div>
+          <div class="feat">
+            <h4>Armor that matters</h4>
+            <p>Armor resists specific damage types like blaster, explosive and ion, and wearing a full set earns a bonus.</p>
+          </div>
+          <div class="feat">
+            <h4>Smarter enemies</h4>
+            <p>NPC and vehicle weapons fire real bolts, so a Jedi can deflect a Stormtrooper's shot.</p>
+          </div>
+          <div class="feat">
+            <h4>Fixes along the way</h4>
+            <p>Green and yellow bolts become deflectable again, silent NPC attacks start working, and missing saber sounds return.</p>
+          </div>
+          <div class="feat">
+            <h4>Safer fights</h4>
+            <p>Friendly fire follows your town and nation, and explosions won't break blocks unless the area allows it.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <b>Keep your gear.</b> Your current weapons and armor convert automatically when you log in, including items in ender chests and shulker boxes. Everything is tested on a separate server before it goes live.
+        </div>
+      </article>
     </section>
 
     <section class="phase">
